@@ -3,7 +3,7 @@ cd ..\..\..\..\..\..
 set GOPATH=%cd%
 cd %CURR%
 
-go build -o objprotogen.exe github.com/davyxu/cellnet/objprotogen
+go build -o objprotogen.exe github.com/mutousay/cellnet/objprotogen
 @IF %ERRORLEVEL% NEQ 0 pause
 
 

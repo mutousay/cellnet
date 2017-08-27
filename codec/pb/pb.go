@@ -1,7 +1,7 @@
 package pbcodec
 
 import (
-	"github.com/davyxu/cellnet"
+	"github.com/mutousay/cellnet"
 	"github.com/golang/protobuf/proto"
 )
 

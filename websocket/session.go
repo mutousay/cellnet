@@ -1,8 +1,8 @@
 package websocket
 
 import (
-	"github.com/davyxu/cellnet"
-	"github.com/davyxu/cellnet/extend"
+	"github.com/mutousay/cellnet"
+	"github.com/mutousay/cellnet/extend"
 	"github.com/gorilla/websocket"
 )
 

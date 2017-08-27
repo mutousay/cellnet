@@ -7,7 +7,7 @@ import (
 	"reflect"
 
 	"github.com/davyxu/goobjfmt"
-	"github.com/davyxu/cellnet/codec/sproto"
+	"github.com/mutousay/cellnet/codec/sproto"
 )
 
 type TestEchoACK struct {

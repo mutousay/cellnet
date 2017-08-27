@@ -1,6 +1,6 @@
 package rpc
 
-import "github.com/davyxu/cellnet"
+import "github.com/mutousay/cellnet"
 
 type RetChanHandler struct {
 	ret chan interface{}

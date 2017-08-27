@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/davyxu/cellnet/util"
+	"github.com/mutousay/cellnet/util"
 	"go/ast"
 )
 

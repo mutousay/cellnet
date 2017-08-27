@@ -1,12 +1,12 @@
 package tests
 
 import (
-	"github.com/davyxu/cellnet"
-	_ "github.com/davyxu/cellnet/codec/pb" // 启用pb编码
-	"github.com/davyxu/cellnet/proto/pb/gamedef"
-	"github.com/davyxu/cellnet/rpc"
-	"github.com/davyxu/cellnet/socket"
-	"github.com/davyxu/cellnet/util"
+	"github.com/mutousay/cellnet"
+	_ "github.com/mutousay/cellnet/codec/pb" // 启用pb编码
+	"github.com/mutousay/cellnet/proto/pb/gamedef"
+	"github.com/mutousay/cellnet/rpc"
+	"github.com/mutousay/cellnet/socket"
+	"github.com/mutousay/cellnet/util"
 	"testing"
 	"time"
 )

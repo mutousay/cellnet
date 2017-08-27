@@ -2,9 +2,9 @@ package main
 
 import (
 	"bufio"
-	"github.com/davyxu/cellnet"
-	"github.com/davyxu/cellnet/examples/chat/proto/chatproto"
-	"github.com/davyxu/cellnet/socket"
+	"github.com/mutousay/cellnet"
+	"github.com/mutousay/cellnet/examples/chat/proto/chatproto"
+	"github.com/mutousay/cellnet/socket"
 	"github.com/davyxu/golog"
 	"os"
 	"strings"

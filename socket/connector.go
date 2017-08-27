@@ -1,10 +1,11 @@
 package socket
 
 import (
-	"github.com/davyxu/cellnet"
-	"github.com/davyxu/cellnet/extend"
-	"net"
+	"github.com/mutousay/cellnet"
+	"github.com/mutousay/cellnet/extend"
+	//"net"
 	"time"
+	kcp "github.com/xtaci/kcp-go"
 )
 
 // 连接器, 可由Peer转换
@@ -59,7 +60,9 @@ func (self *socketConnector) connect(address string) {
 		self.tryConnTimes++
 
 		// 开始连接
-		conn, err := net.Dial("tcp", address)
+		//kcp修改
+		//conn, err := net.Dial("tcp", address)
+		conn, err := kcp.Dial(address)
 
 		// 连不上
 		if err != nil {
@@ -85,6 +88,7 @@ func (self *socketConnector) connect(address string) {
 			// 继续连接
 			continue
 		}
+		log.Debugln("connector adress", address)
 
 		ses := newSession(conn, self)
 		self.defaultSes = ses

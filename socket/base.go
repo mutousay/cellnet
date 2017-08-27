@@ -1,7 +1,7 @@
 package socket
 
 import (
-	"github.com/davyxu/cellnet"
+	"github.com/mutousay/cellnet"
 	"net"
 )
 

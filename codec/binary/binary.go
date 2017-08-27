@@ -1,7 +1,7 @@
 package binary
 
 import (
-	"github.com/davyxu/cellnet"
+	"github.com/mutousay/cellnet"
 	"github.com/davyxu/goobjfmt"
 )
 
