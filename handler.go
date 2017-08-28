@@ -32,7 +32,7 @@ func HandlerString(h EventHandler) string {
 func HandlerLog(h EventHandler, ev *Event) {
 
 	if EnableHandlerLog {
-		log.Debugf("evid: %d #%s [%s] chain: %d <%s> SesID: %d Result: %d MsgID: %d(%s) {%s} Tag: %v TransmitTag: %v Raw: (%d)%v",
+		log.Debugf("[handlerChainCall] evid: %d #%s [%s] chain: %d <%s> SesID: %d Result: %d MsgID: %d(%s) {%s} Tag: %v TransmitTag: %v Raw: (%d)%v",
 			ev.UID,
 			ev.Type.String(),
 			ev.PeerName(),
