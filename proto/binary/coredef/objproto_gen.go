@@ -3,8 +3,8 @@
 package coredef
 
 import (
-	"github.com/mutousay/cellnet"
 	"github.com/davyxu/goobjfmt"
+	"github.com/mutousay/cellnet"
 	"reflect"
 )
 

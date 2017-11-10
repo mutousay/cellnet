@@ -1,8 +1,8 @@
 package binary
 
 import (
-	"github.com/mutousay/cellnet"
 	"github.com/davyxu/goobjfmt"
+	"github.com/mutousay/cellnet"
 )
 
 type binaryCodec struct {

@@ -5,9 +5,9 @@ import (
 	"path"
 	"reflect"
 
+	"github.com/davyxu/gosproto"
 	"github.com/mutousay/cellnet"
 	"github.com/mutousay/cellnet/util"
-	"github.com/davyxu/gosproto"
 )
 
 type sprotoCodec struct {

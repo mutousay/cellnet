@@ -66,13 +66,14 @@ func (self *HandlerChain) Call(ev *Event) {
 		HandlerLog(h, ev)
 
 		h.Call(ev)
-
 		if ev.Result() == Result_NextChain {
+			//log.Debugln("handlerchaing call Result_NextChain", ev.PeerName(), HandlerString(h))
 			ev.SetResult(Result_OK)
 			break
 		}
 
 		if ev.Result() != Result_OK {
+			//log.Debugln("handlerchaing call Not Ok Result_OK", ev.PeerName(), HandlerString(h))
 			break
 		}
 	}

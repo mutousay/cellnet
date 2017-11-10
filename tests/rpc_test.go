@@ -7,6 +7,7 @@ import (
 	"github.com/mutousay/cellnet/rpc"
 	"github.com/mutousay/cellnet/socket"
 	"github.com/mutousay/cellnet/util"
+	"runtime"
 	"testing"
 	"time"
 )
@@ -123,6 +124,9 @@ func syncClient() {
 }
 
 func TestAsyncRPC(t *testing.T) {
+
+	runtime.GOMAXPROCS(1)
+	cellnet.EnableHandlerLog = true
 
 	asyncSignal = util.NewSignalTester(t)
 

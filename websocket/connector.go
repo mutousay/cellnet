@@ -3,9 +3,9 @@ package websocket
 import (
 	"net/url"
 
+	"github.com/gorilla/websocket"
 	"github.com/mutousay/cellnet"
 	"github.com/mutousay/cellnet/extend"
-	"github.com/gorilla/websocket"
 )
 
 // 连接器, 可由Peer转换

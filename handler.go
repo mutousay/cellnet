@@ -58,7 +58,6 @@ func HandlerChainCall(hlist []EventHandler, ev *Event) {
 		HandlerLog(h, ev)
 
 		h.Call(ev)
-
 		if ev.Result() != Result_OK {
 			break
 		}

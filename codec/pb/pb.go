@@ -1,8 +1,8 @@
 package pbcodec
 
 import (
-	"github.com/mutousay/cellnet"
 	"github.com/golang/protobuf/proto"
+	"github.com/mutousay/cellnet"
 )
 
 type pbCodec struct {

@@ -20,8 +20,22 @@ func Call(sesOrPeer interface{}, reqMsg interface{}, ackMsgName string, timeout 
 		return err
 	}
 
-	time.AfterFunc(timeout, func() {
+	ontimeout := func() {
+		log.Debugln("req_async timeout 33333")
+		ev := cellnet.NewEvent(cellnet.Event_Send, ses)
+		ev.SetResult(cellnet.Result_RPCTimeout)
+		userCallback(ev)
 		p.RemoveChainRecv(rpcid)
+	}
+
+	time.AfterFunc(timeout, func() {
+		if p.ChainRecvExists(rpcid) {
+			if p.Queue() != nil {
+				p.Queue().Post(ontimeout)
+			} else {
+				ontimeout()
+			}
+		}
 	})
 
 	// 发送RPC请求

@@ -73,6 +73,7 @@ func (self *SessionManagerImplement) Add(ses Session) {
 
 func (self *SessionManagerImplement) Remove(ses Session) {
 	self.sesMapGuard.Lock()
+	log.Debugln("Remove Session", ses.ID())
 	delete(self.sesMap, ses.ID())
 	self.sesMapGuard.Unlock()
 }

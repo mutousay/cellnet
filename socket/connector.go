@@ -4,8 +4,8 @@ import (
 	"github.com/mutousay/cellnet"
 	"github.com/mutousay/cellnet/extend"
 	//"net"
-	"time"
 	kcp "github.com/xtaci/kcp-go"
+	"time"
 )
 
 // 连接器, 可由Peer转换

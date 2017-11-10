@@ -1,10 +1,10 @@
 package gamedef
 
 import (
+	"github.com/davyxu/goobjfmt"
 	"github.com/mutousay/cellnet"
 	_ "github.com/mutousay/cellnet/codec/json"
 	"github.com/mutousay/cellnet/util"
-	"github.com/davyxu/goobjfmt"
 	"reflect"
 )
 

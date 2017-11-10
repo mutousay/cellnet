@@ -17,7 +17,7 @@ func buildRecvHandler(p cellnet.Peer, msgName string, tailHandler cellnet.EventH
 		cellnet.NewMatchMsgIDHandler(msgMeta.ID),
 		cellnet.StaticDecodePacketHandler(),
 		cellnet.NewQueuePostHandler(p.Queue(), tailHandler, cellnet.NewCallbackHandler(func(ev *cellnet.Event) {
-
+			log.Debugln("buildRecvHandler  delete rpcID", rpcID)
 			p.RemoveChainRecv(rpcID)
 
 		})),

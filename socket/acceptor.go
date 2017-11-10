@@ -2,7 +2,7 @@ package socket
 
 import (
 	"net"
-	"time"
+	//"time"
 	"github.com/mutousay/cellnet"
 	"github.com/mutousay/cellnet/extend"
 
@@ -31,7 +31,7 @@ func (self *socketAcceptor) Start(address string) cellnet.Peer {
 	ln, err := kcp.Listen(address)
 	if err != nil {
 		log.Errorf("#listen failed(%s) %v", self.NameOrAddress(), err.Error())
-		return self		
+		return self
 	}
 	kcpListener := ln.(*kcp.Listener)
 	kcpListener.SetReadBuffer(4 * 1024 * 1024)
@@ -54,8 +54,8 @@ func (self *socketAcceptor) accept() {
 	for {
 		log.Infoln("wait next connection ")
 		conn, err := self.listener.Accept()
-		//kcp修改
-		conn.(*kcp.UDPSession).SetNoDelay(1, 30, 2, 1)
+		//kcp修改 todo 可能内存错误
+		//conn.(*kcp.UDPSession).SetNoDelay(1, 30, 2, 1)
 		if self.isStopping() {
 			break
 		}
@@ -91,9 +91,10 @@ func (self *socketAcceptor) onAccepted(conn net.Conn) {
 	conn.(*kcp.UDPSession).SetDSCP(46)
 	conn.(*kcp.UDPSession).SetMtu(1400)
 	conn.(*kcp.UDPSession).SetACKNoDelay(false)
-	conn.(*kcp.UDPSession).SetReadDeadline(time.Now().Add(time.Hour))
-	conn.(*kcp.UDPSession).SetWriteDeadline(time.Now().Add(time.Hour))
-	
+	// TODO 可能导致session 每个小时都断掉的原因就是这里
+	// conn.(*kcp.UDPSession).SetReadDeadline(time.Now().Add(time.Hour))
+	// conn.(*kcp.UDPSession).SetWriteDeadline(time.Now().Add(time.Hour))
+
 	// 添加到管理器
 	self.Add(ses)
 	log.Debugf("onAccepted session sid:%d", ses.ID)

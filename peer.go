@@ -21,6 +21,13 @@ type Session interface {
 	SetTag(tag interface{})
 
 	Tag() interface{}
+
+	//新加
+	IsClosed() bool 
+
+	AddCloseCallback(interface{}, func())
+
+	RemoveCloseCallback(interface{})
 }
 
 // 端, Connector或Acceptor

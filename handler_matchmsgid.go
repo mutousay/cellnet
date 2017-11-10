@@ -11,7 +11,6 @@ func (self *MatchMsgIDHandler) String() string {
 }
 
 func (self *MatchMsgIDHandler) Call(ev *Event) {
-
 	if ev.MsgID != self.msgid {
 		ev.SetResult(Result_NextChain)
 	}

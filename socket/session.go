@@ -5,8 +5,11 @@ import (
 	"github.com/mutousay/cellnet/extend"
 	"io"
 	"net"
+	"runtime/debug"
 	"sync"
+	"sync/atomic"
 	"time"
+	"container/list"
 )
 
 type socketSession struct {
@@ -29,6 +32,13 @@ type socketSession struct {
 	readChain *cellnet.HandlerChain
 
 	writeChain *cellnet.HandlerChain
+
+	//新加的字段
+	closeFlag       int32
+
+	closeEventMutex sync.Mutex
+
+	closeCallbacks  *list.List
 }
 
 func (self *socketSession) Tag() interface{} {
@@ -56,7 +66,11 @@ func (self *socketSession) DataSource() io.ReadWriter {
 }
 
 func (self *socketSession) Close() {
-	self.sendList.Add(nil)
+	debug.PrintStack()
+	if atomic.CompareAndSwapInt32(&self.closeFlag, 0, 1) {
+		self.invokeCloseCallbacks()
+		self.sendList.Add(nil)
+	}
 }
 
 func (self *socketSession) Send(data interface{}) {
@@ -92,12 +106,13 @@ func (self *socketSession) recvThread() {
 		read, _ := self.FromPeer().(SocketOptions).SocketDeadline()
 
 		if read != 0 {
+			log.Debugln("recvThread  SetReadDeadline", read, time.Now().Add(read))
 			self.conn.SetReadDeadline(time.Now().Add(read))
 		}
 
 		self.readChain.Call(ev)
-
 		if ev.Result() != cellnet.Result_OK {
+			log.Debugln("readChain.Call() Not OK", ev.Result())
 			goto onClose
 		}
 
@@ -107,6 +122,7 @@ func (self *socketSession) recvThread() {
 		self.p.ChainListRecv().Call(ev)
 
 		if ev.Result() != cellnet.Result_OK {
+			log.Debugln("readChain.Call() Not OK", ev.Result())
 			goto onClose
 		}
 
@@ -135,6 +151,7 @@ func (self *socketSession) sendThread() {
 		_, write := self.FromPeer().(SocketOptions).SocketDeadline()
 
 		if write != 0 {
+			log.Debugln("sendThread SocketDeadline", write, time.Now().Add(write))
 			self.conn.SetWriteDeadline(time.Now().Add(write))
 		}
 
@@ -219,6 +236,7 @@ func newSession(conn net.Conn, p cellnet.Peer) *socketSession {
 		p:               p,
 		needNotifyWrite: true,
 		sendList:        NewPacketList(),
+		closeCallbacks: list.New(),
 	}
 
 	self.readChain = p.CreateChainRead()
@@ -226,4 +244,49 @@ func newSession(conn net.Conn, p cellnet.Peer) *socketSession {
 	self.writeChain = p.CreateChainWrite()
 
 	return self
+}
+
+
+type closeCallback struct {
+	Handler interface{}
+	Func    func()
+}
+
+func (session *socketSession) IsClosed() bool { return atomic.LoadInt32(&session.closeFlag) == 1 }
+
+func (session *socketSession) AddCloseCallback(handler interface{}, callback func()) {
+	if session.IsClosed() {
+		return
+	}
+
+	session.closeEventMutex.Lock()
+	defer session.closeEventMutex.Unlock()
+
+	session.closeCallbacks.PushBack(closeCallback{handler, callback})
+}
+
+func (session *socketSession) RemoveCloseCallback(handler interface{}) {
+	if session.IsClosed() {
+		return
+	}
+
+	session.closeEventMutex.Lock()
+	defer session.closeEventMutex.Unlock()
+
+	for i := session.closeCallbacks.Front(); i != nil; i = i.Next() {
+		if i.Value.(closeCallback).Handler == handler {
+			session.closeCallbacks.Remove(i)
+			return
+		}
+	}
+}
+
+func (session *socketSession) invokeCloseCallbacks() {
+	session.closeEventMutex.Lock()
+	defer session.closeEventMutex.Unlock()
+
+	for i := session.closeCallbacks.Front(); i != nil; i = i.Next() {
+		callback := i.Value.(closeCallback)
+		callback.Func()
+	}
 }

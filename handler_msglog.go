@@ -31,6 +31,7 @@ func MsgLog(ev *Event) {
 	ev.Parse()
 
 	if IsBlockedMessageByID(ev.MsgID) {
+		log.Debugln("IsBlockedMessageByID xxxxx", ev.MsgID)
 		return
 	}
 

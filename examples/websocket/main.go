@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/davyxu/golog"
 	"github.com/mutousay/cellnet"
 	jsongamedef "github.com/mutousay/cellnet/proto/json/gamedef" // json逻辑协议
 	"github.com/mutousay/cellnet/websocket"
-	"github.com/davyxu/golog"
 )
 
 var log *golog.Logger = golog.New("main")

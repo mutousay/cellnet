@@ -1,9 +1,9 @@
 package websocket
 
 import (
+	"github.com/gorilla/websocket"
 	"github.com/mutousay/cellnet"
 	"github.com/mutousay/cellnet/extend"
-	"github.com/gorilla/websocket"
 )
 
 type wsSession struct {

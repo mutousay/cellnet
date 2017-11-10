@@ -6,8 +6,8 @@ package chatproto
 
 import (
 	"github.com/mutousay/cellnet"
-	"reflect"
 	_ "github.com/mutousay/cellnet/codec/pb"
+	"reflect"
 )
 
 func init() {

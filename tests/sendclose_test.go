@@ -116,7 +116,7 @@ func testRecvDisconnected() {
 	})
 
 	cellnet.RegisterMessage(p, "coredef.SessionClosed", func(ev *cellnet.Event) {
-
+		//log.Debugln("RecvDisconnectedclose ok!", ev)
 		// 断开
 		signal.Done(3)
 	})
@@ -141,6 +141,8 @@ func TestConnActiveClose(t *testing.T) {
 }
 
 func TestRecvDisconnected(t *testing.T) {
+
+	cellnet.EnableHandlerLog = true
 
 	signal = util.NewSignalTester(t)
 
