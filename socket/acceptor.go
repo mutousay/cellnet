@@ -12,7 +12,9 @@ import (
 type socketAcceptor struct {
 	*socketPeer
 
+	//TCP
 	//listener net.Listener
+	//KCP
 	listener *kcp.Listener
 }
 
@@ -26,8 +28,15 @@ func (self *socketAcceptor) Start(address string) cellnet.Peer {
 
 	self.SetAddress(address)
 
-	//kcp修改
-	//ln, err := net.Listen("tcp", address)
+	//TCP
+	// ln, err := net.Listen("tcp", address)
+	// if err != nil {
+	// 	log.Errorf("#listen failed(%s) %v", self.NameOrAddress(), err.Error())
+	// 	return self
+	// }
+	// self.listener = ln
+	
+	//KCP
 	ln, err := kcp.Listen(address)
 	if err != nil {
 		log.Errorf("#listen failed(%s) %v", self.NameOrAddress(), err.Error())
@@ -38,6 +47,7 @@ func (self *socketAcceptor) Start(address string) cellnet.Peer {
 	kcpListener.SetWriteBuffer(4 * 1024 * 1024)
 	kcpListener.SetDSCP(46)
 	self.listener = kcpListener
+
 
 	log.Infof("#listen(%s) %s", self.Name(), self.Address())
 
@@ -52,10 +62,10 @@ func (self *socketAcceptor) accept() {
 	self.SetRunning(true)
 
 	for {
-		log.Infoln("wait next connection ")
+		log.Debugln("wait next connection ")
 		conn, err := self.listener.Accept()
-		//kcp修改 todo 可能内存错误
-		//conn.(*kcp.UDPSession).SetNoDelay(1, 30, 2, 1)
+		//KCP TODO 可能内存错误
+		conn.(*kcp.UDPSession).SetNoDelay(1, 30, 2, 1)
 		if self.isStopping() {
 			break
 		}
@@ -85,19 +95,19 @@ func (self *socketAcceptor) accept() {
 func (self *socketAcceptor) onAccepted(conn net.Conn) {
 
 	ses := newSession(conn, self)
+	// KCP
 	conn.(*kcp.UDPSession).SetStreamMode(true)
 	conn.(*kcp.UDPSession).SetWindowSize(4096, 4096)
 	conn.(*kcp.UDPSession).SetNoDelay(1, 10, 2, 1)
 	conn.(*kcp.UDPSession).SetDSCP(46)
 	conn.(*kcp.UDPSession).SetMtu(1400)
 	conn.(*kcp.UDPSession).SetACKNoDelay(false)
-	// TODO 可能导致session 每个小时都断掉的原因就是这里
-	// conn.(*kcp.UDPSession).SetReadDeadline(time.Now().Add(time.Hour))
-	// conn.(*kcp.UDPSession).SetWriteDeadline(time.Now().Add(time.Hour))
+	//TODO 可能导致session 每个小时都断掉的原因就是这里
+	//conn.(*kcp.UDPSession).SetReadDeadline(time.Now().Add(time.Hour))
+	//conn.(*kcp.UDPSession).SetWriteDeadline(time.Now().Add(time.Hour))
 
 	// 添加到管理器
 	self.Add(ses)
-	log.Debugf("onAccepted session sid:%d", ses.ID)
 	// 断开后从管理器移除
 	ses.OnClose = func() {
 		self.Remove(ses)

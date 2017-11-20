@@ -15,36 +15,31 @@ type PrivatePacketReader struct {
 func (self *PrivatePacketReader) Call(ev *cellnet.Event) {
 
 	headReader := bytes.NewReader(ev.Data)
-	//log.Debugln("PrivatePacketReader  data", headReader)
 	// 读取序号
 	var ser uint16
 	if err := binary.Read(headReader, binary.LittleEndian, &ser); err != nil {
-		log.Debugln("PrivatePacketReader  1111")
+		log.Debugln("PrivatePacketReader  ser error", err)
 		ev.SetResult(cellnet.Result_PackageCrack)
 		return
 	}
 
 	// 读取ID
 	if err := binary.Read(headReader, binary.LittleEndian, &ev.MsgID); err != nil {
-		log.Debugln("PrivatePacketReader  2222")
+		log.Debugln("PrivatePacketReader  ev.MsgID  error ", err)
 		ev.SetResult(cellnet.Result_PackageCrack)
 		return
 	}
-	//log.Debugln("PrivatePacketReader  msgID", ev.MsgID)
-
 	// 读取Payload大小
 	var bodySize uint32
 	if err := binary.Read(headReader, binary.LittleEndian, &bodySize); err != nil {
-		log.Debugln("PrivatePacketReader  3333")
 		ev.SetResult(cellnet.Result_PackageCrack)
 		return
 	}
-	//log.Debugln("PrivatePacketReader  size", bodySize)
 
 	maxPacketSize := ev.Ses.FromPeer().(SocketOptions).MaxPacketSize()
 	// 封包太大
 	if maxPacketSize > 0 && int(bodySize) > maxPacketSize {
-		log.Debugln("PrivatePacketReader  44444")
+		log.Errorln("PrivatePacketReader over maxPacketSize")
 		ev.SetResult(cellnet.Result_PackageCrack)
 		return
 	}
@@ -67,13 +62,10 @@ func (self *PrivatePacketReader) Call(ev *cellnet.Event) {
 	// 读取数据
 	dataBuffer := make([]byte, bodySize)
 	if _, err := io.ReadFull(reader, dataBuffer); err != nil {
-		log.Debugln("PrivatePacketReader  66666")
+		log.Errorln("PrivatePacketReader  io.ReadFull error", err)
 		ev.SetResult(cellnet.Result_PackageCrack)
 		return
 	}
-
-	//log.Debugln("PrivatePacketReader  data bufffer", dataBuffer)
-
 	ev.Data = dataBuffer
 
 	// 增加序列号值
@@ -101,7 +93,6 @@ func (self *PrivatePacketWriter) Call(ev *cellnet.Event) {
 	var outputHeadBuffer bytes.Buffer
 
 	// 写序号
-	//log.Debugln("PrivatePacketWriter sendser ", self.sendser)
 	if err := binary.Write(&outputHeadBuffer, binary.LittleEndian, self.sendser); err != nil {
 		ev.SetResult(cellnet.Result_PackageCrack)
 		return

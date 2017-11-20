@@ -60,8 +60,9 @@ func (self *socketConnector) connect(address string) {
 		self.tryConnTimes++
 
 		// 开始连接
-		//kcp修改
-		//conn, err := net.Dial("tcp", address)
+		//TCP
+		// conn, err := net.Dial("tcp", address)
+		//KCP
 		conn, err := kcp.Dial(address)
 
 		// 连不上

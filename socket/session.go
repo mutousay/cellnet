@@ -66,7 +66,7 @@ func (self *socketSession) DataSource() io.ReadWriter {
 }
 
 func (self *socketSession) Close() {
-	debug.PrintStack()
+	log.Debugln("session close", debug.Stack())
 	if atomic.CompareAndSwapInt32(&self.closeFlag, 0, 1) {
 		self.invokeCloseCallbacks()
 		self.sendList.Add(nil)
@@ -106,7 +106,6 @@ func (self *socketSession) recvThread() {
 		read, _ := self.FromPeer().(SocketOptions).SocketDeadline()
 
 		if read != 0 {
-			log.Debugln("recvThread  SetReadDeadline", read, time.Now().Add(read))
 			self.conn.SetReadDeadline(time.Now().Add(read))
 		}
 
@@ -151,7 +150,6 @@ func (self *socketSession) sendThread() {
 		_, write := self.FromPeer().(SocketOptions).SocketDeadline()
 
 		if write != 0 {
-			log.Debugln("sendThread SocketDeadline", write, time.Now().Add(write))
 			self.conn.SetWriteDeadline(time.Now().Add(write))
 		}
 

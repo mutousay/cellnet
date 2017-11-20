@@ -11,22 +11,19 @@ type FixedLengthFrameReader struct {
 }
 
 func (self *FixedLengthFrameReader) Call(ev *Event) {
-	log.Debugln("FixedLengthFrameReader call ev", ev)
 	reader := ev.Ses.(interface {
 		DataSource() io.ReadWriter
 	}).DataSource()
 
 	_, err := io.ReadFull(reader, self.headerBuffer)
-	log.Debugln("FixedLengthFrameReader reader", reader)
 	if err != nil {
-		debug.PrintStack()
+		log.Debugln("FixedLengthFrameReader io.ReadFull", debug.Stack())
 		log.Debugln("FixedLengthFrameReader err", err)
 		ev.SetResult(Result_SocketError)
 		//TODO 导致session异常断开的问题，暂时不进行关闭处理
 		//TODO 考虑获取sessionID,如果是服务器的session则不进行关闭，如果是客户端的session则关闭
 		return
 	}
-	log.Debugln("FixedLengthFrameReader headerbuff", self.headerBuffer)
 	ev.Data = self.headerBuffer
 }
 
