@@ -2,11 +2,11 @@ package socket
 
 import (
 	"net"
-	//"time"
+	"time"
 	"github.com/mutousay/cellnet"
 	"github.com/mutousay/cellnet/extend"
 
-	kcp "github.com/xtaci/kcp-go"
+	kcp "github.com/mutousay/kcp-go"
 )
 
 type socketAcceptor struct {
@@ -69,6 +69,7 @@ func (self *socketAcceptor) accept() {
 		if self.isStopping() {
 			break
 		}
+		log.Debugln("new next connection", conn.(*kcp.UDPSession).GetConv())
 
 		if err != nil {
 
@@ -97,12 +98,16 @@ func (self *socketAcceptor) onAccepted(conn net.Conn) {
 	ses := newSession(conn, self)
 	// KCP
 	conn.(*kcp.UDPSession).SetStreamMode(true)
+	//TODO 如果需要传大于4096的数据给客户端，则要调整这个值
 	conn.(*kcp.UDPSession).SetWindowSize(4096, 4096)
 	conn.(*kcp.UDPSession).SetNoDelay(1, 10, 2, 1)
 	conn.(*kcp.UDPSession).SetDSCP(46)
 	conn.(*kcp.UDPSession).SetMtu(1400)
 	conn.(*kcp.UDPSession).SetACKNoDelay(false)
-	//TODO 可能导致session 每个小时都断掉的原因就是这里
+
+	//TODO 如果是服务器session则不要设置这2个值 
+	// -- 目前没有更好的办法区分是不是服务器的session,只能设置，服务器的连接全部加上心跳来处理
+	ses.FromPeer().(SocketOptions).SetSocketDeadline( 30 * time.Second, 0)
 	//conn.(*kcp.UDPSession).SetReadDeadline(time.Now().Add(time.Hour))
 	//conn.(*kcp.UDPSession).SetWriteDeadline(time.Now().Add(time.Hour))
 

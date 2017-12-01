@@ -10,6 +10,7 @@ import (
 	"sync/atomic"
 	"time"
 	"container/list"
+	kcp "github.com/mutousay/kcp-go"
 )
 
 type socketSession struct {
@@ -56,6 +57,10 @@ func (self *socketSession) SetID(id int64) {
 	self.id = id
 }
 
+func (self *socketSession) Conn() net.Conn {
+	return self.conn
+}
+
 func (self *socketSession) FromPeer() cellnet.Peer {
 	return self.p
 }
@@ -66,8 +71,10 @@ func (self *socketSession) DataSource() io.ReadWriter {
 }
 
 func (self *socketSession) Close() {
-	log.Debugln("session close", debug.Stack())
+	//TODO 测试是否能够真的正常Close连接 应该要能够正常调用到KCP底层的Close
+	log.Infoln("session close")
 	if atomic.CompareAndSwapInt32(&self.closeFlag, 0, 1) {
+		debug.PrintStack()
 		self.invokeCloseCallbacks()
 		self.sendList.Add(nil)
 	}
@@ -104,10 +111,13 @@ func (self *socketSession) recvThread() {
 		ev := cellnet.NewEvent(cellnet.Event_Recv, self)
 
 		read, _ := self.FromPeer().(SocketOptions).SocketDeadline()
-
-		if read != 0 {
+		isGameServer := ev.Ses.Conn().(*kcp.UDPSession).IsGameServer()
+		log.Infoln("SocketDeadline read isGameServer ", read, isGameServer)
+		if read != 0 && isGameServer != true {
+			log.Debugln("SocketDeadline set read", read)
 			self.conn.SetReadDeadline(time.Now().Add(read))
 		}
+		
 
 		self.readChain.Call(ev)
 		if ev.Result() != cellnet.Result_OK {
@@ -193,8 +203,15 @@ exitsendloop:
 	// 不需要读线程再次通知写线程
 	self.needNotifyWrite = false
 
+	//TODO 是否有正常出发掉这个conn的Close()
+	//TODO 这里应该要触发的KCP底层的Close(),而不是conn的net.go中的Close
+	log.Debugln("exitsendloop", self.ID())
+	err := self.conn.(*kcp.UDPSession).Close()
+	if err != nil {
+		log.Debugln("exitsendloop error", self.ID())
+	}
 	// 关闭socket,触发读错误, 结束读循环
-	self.conn.Close()
+	//self.conn.Close()
 
 	// 通知发送线程ok
 	self.endSync.Done()
@@ -209,6 +226,8 @@ func (self *socketSession) run() {
 
 		// 等待2个任务结束
 		self.endSync.Wait()
+
+		log.Debugln("self.endSync close", self.ID())
 
 		// 在这里断开session与逻辑的所有关系
 		if self.OnClose != nil {

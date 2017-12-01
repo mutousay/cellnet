@@ -68,13 +68,13 @@ func (self *SessionManagerImplement) Add(ses Session) {
 	}).SetID(id)
 
 	self.sesMap[id] = ses
-
+	log.Debugf("ADD Session %d: count: %d", id, len(self.sesMap))
 }
 
 func (self *SessionManagerImplement) Remove(ses Session) {
 	self.sesMapGuard.Lock()
-	log.Debugln("Remove Session", ses.ID())
 	delete(self.sesMap, ses.ID())
+	log.Debugf("Remove Session %d: count: %d", ses.ID(), len(self.sesMap))
 	self.sesMapGuard.Unlock()
 }
 

@@ -2,7 +2,7 @@ package cellnet
 
 import (
 	"io"
-	"runtime/debug"
+	//"runtime/debug"
 	"sync"
 )
 
@@ -14,13 +14,10 @@ func (self *FixedLengthFrameReader) Call(ev *Event) {
 	reader := ev.Ses.(interface {
 		DataSource() io.ReadWriter
 	}).DataSource()
-
 	_, err := io.ReadFull(reader, self.headerBuffer)
 	if err != nil {
-		log.Debugln("FixedLengthFrameReader io.ReadFull", debug.Stack())
-		log.Debugln("FixedLengthFrameReader err", err)
+		log.Infoln("FixedLengthFrameReader err", err)
 		ev.SetResult(Result_SocketError)
-		//TODO 导致session异常断开的问题，暂时不进行关闭处理
 		//TODO 考虑获取sessionID,如果是服务器的session则不进行关闭，如果是客户端的session则关闭
 		return
 	}

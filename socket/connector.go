@@ -4,7 +4,7 @@ import (
 	"github.com/mutousay/cellnet"
 	"github.com/mutousay/cellnet/extend"
 	//"net"
-	kcp "github.com/xtaci/kcp-go"
+	kcp "github.com/mutousay/kcp-go"
 	"time"
 )
 

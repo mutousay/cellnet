@@ -1,5 +1,9 @@
 package cellnet
 
+import (
+	"net"
+)
+
 // 会话
 type Session interface {
 
@@ -28,6 +32,8 @@ type Session interface {
 	AddCloseCallback(interface{}, func())
 
 	RemoveCloseCallback(interface{})
+
+	Conn() net.Conn
 }
 
 // 端, Connector或Acceptor
