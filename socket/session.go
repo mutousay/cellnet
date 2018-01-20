@@ -5,7 +5,6 @@ import (
 	"github.com/mutousay/cellnet/extend"
 	"io"
 	"net"
-	"runtime/debug"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -72,9 +71,8 @@ func (self *socketSession) DataSource() io.ReadWriter {
 
 func (self *socketSession) Close() {
 	//TODO 测试是否能够真的正常Close连接 应该要能够正常调用到KCP底层的Close
-	log.Infoln("session close")
+	log.Debugln("session close")
 	if atomic.CompareAndSwapInt32(&self.closeFlag, 0, 1) {
-		debug.PrintStack()
 		self.invokeCloseCallbacks()
 		self.sendList.Add(nil)
 	}
@@ -112,13 +110,11 @@ func (self *socketSession) recvThread() {
 
 		read, _ := self.FromPeer().(SocketOptions).SocketDeadline()
 		isGameServer := ev.Ses.Conn().(*kcp.UDPSession).IsGameServer()
-		log.Infoln("SocketDeadline read isGameServer ", read, isGameServer)
 		if read != 0 && isGameServer != true {
 			log.Debugln("SocketDeadline set read", read)
 			self.conn.SetReadDeadline(time.Now().Add(read))
 		}
 		
-
 		self.readChain.Call(ev)
 		if ev.Result() != cellnet.Result_OK {
 			log.Debugln("readChain.Call() Not OK", ev.Result())

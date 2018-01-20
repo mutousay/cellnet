@@ -16,7 +16,7 @@ func (self *FixedLengthFrameReader) Call(ev *Event) {
 	}).DataSource()
 	_, err := io.ReadFull(reader, self.headerBuffer)
 	if err != nil {
-		log.Infoln("FixedLengthFrameReader err", err)
+		log.Debugln("FixedLengthFrameReader err", err)
 		ev.SetResult(Result_SocketError)
 		//TODO 考虑获取sessionID,如果是服务器的session则不进行关闭，如果是客户端的session则关闭
 		return
